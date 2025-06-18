@@ -4,8 +4,8 @@ version = "0.1.0"
 edition = "2024"
 
 [workspace]
-members = ["audio_lib"]
+members = ["audio_lib", "audio_player"]
 
 [dependencies]
 audio_lib = { path = "./audio_lib" }
-iced = "0.4"
+audio_player = { path = "./audio_player" }

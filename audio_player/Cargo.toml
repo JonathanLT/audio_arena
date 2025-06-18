@@ -1,0 +1,8 @@
+[package]
+name = "audio_player"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+rodio = "0.20.1"
+crossterm = "0.29.0"

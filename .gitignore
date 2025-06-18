@@ -1,0 +1,16 @@
+# Mac files
+.DS_Store
+
+# Rust files
+*.rs.bk
+*.rs.orig
+
+# Build artifacts
+/target
+Cargo.lock
+
+# Logs
+*.log
+
+# Project private directories
+/musics

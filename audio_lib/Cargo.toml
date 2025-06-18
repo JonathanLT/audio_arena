@@ -1,0 +1,13 @@
+[package]
+name = "audio_lib"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+walkdir = "2.4"
+symphonia = { version = "0.5", features = ["all"] }
+rodio = "0.20.1"
+crossterm = "0.29.0"
+rand = "0.9.1"
+druid = { version = "0.7.0", features = ["gtk"] }
+iced = "0.4"

@@ -1,0 +1,11 @@
+[package]
+name = "audio_arena"
+version = "0.1.0"
+edition = "2024"
+
+[workspace]
+members = ["audio_lib"]
+
+[dependencies]
+audio_lib = { path = "./audio_lib" }
+iced = "0.4"

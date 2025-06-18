@@ -4,8 +4,13 @@ version = "0.1.0"
 edition = "2024"
 
 [workspace]
-members = ["audio_lib", "audio_player"]
+members = [ "audio_lib", "audio_player"]
 
 [dependencies]
 audio_lib = { path = "./audio_lib" }
 audio_player = { path = "./audio_player" }
+druid = "0.8.3"
+eframe = "0.31.1"
+egui = "0.31.1"
+im = "15.1.0"
+rand = "0.9.1"

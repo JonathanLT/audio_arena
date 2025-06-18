@@ -1,64 +1,114 @@
-use audio_lib::AudioLibrary;
+use audio_lib::{AudioLibrary, AudioFile};
 use audio_player::AudioPlayer;
-use std::io::{self, Read};
+use eframe::{egui, App, Frame};
+use rand::rng;
 
-fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let library = AudioLibrary::load_from_dir("musics");
-    let files = library.shuffled();
-    let player = AudioPlayer::new();
+pub struct GuiPlayerApp {
+    playlist: Vec<AudioFile>,
+    current: Option<AudioFile>,
+    is_playing: bool,
+    is_paused: bool,
+    player: AudioPlayer,
+}
 
-    println!("🎵 Bienvenue dans Audio Arena !");
-    println!("Commandes : [Entrée] = suivant, p = pause, r = reprendre, s = stop, q = quitter\n");
-
-    let mut is_paused = false;
-    let mut index = 0;
-    let mut file: &audio_lib::AudioFile;
-    while !files.is_empty() {
-        if !is_paused {
-            file = files.get(index).expect("La bibliothèque audio est vide");
-            println!("🎶 Lecture de : {:?}", file.path.file_name().unwrap());
-            player.play(file.path.clone());
-            index += 1;
-        }
-
-        loop {
-            let mut buffer = [0; 1];
-            if io::stdin().read(&mut buffer).is_ok() {
-                match buffer[0] as char {
-                    'p' => {
-                        player.pause();
-                        is_paused = true;
-                        index -= 1; // Ne pas avancer si on met en pause
-                        println!("⏸️ Pause");
-                    }
-                    'r' => {
-                        player.resume();
-                        is_paused = false;
-                        println!("▶️ Reprise");
-                    }
-                    's' => {
-                        player.stop();
-                        println!("⛔ Arrêt demandé.");
-                        return Ok(());
-                    }
-                    'q' => {
-                        player.stop();
-                        println!("👋 Quitter.");
-                        return Ok(());
-                    }
-                    '\n' => {
-                        player.stop();
-                        break; // Passe à la musique suivante
-                    }
-                    _ => {}
-                }
-            }
-        }
-        if index >= files.len() {
-            break;
+impl Default for GuiPlayerApp {
+    fn default() -> Self {
+        let library = AudioLibrary::load_from_dir("musics");
+        let playlist = library.shuffled();
+        Self {
+            playlist,
+            current: None,
+            is_playing: false,
+            is_paused: false,
+            player: AudioPlayer::new(),
         }
     }
+}
 
-    println!("✅ Fin de session.");
-    Ok(())
+impl App for GuiPlayerApp {
+
+    fn update(&mut self, ctx: &egui::Context, _frame: &mut Frame) {
+        egui::CentralPanel::default().show(ctx, |ui| {
+            ui.heading("Audio Arena");
+
+            if let Some(current) = &self.current {
+                ui.label(format!(
+                    "En cours : {}",
+                    current
+                        .path
+                        .file_name()
+                        .map(|n| n.to_string_lossy())
+                        .unwrap_or_default()
+                ));
+            } else {
+                ui.label("Aucune lecture");
+            }
+
+            ui.horizontal(|ui| {
+                if ui.button("Pause").clicked() {
+                    self.player.pause();
+                    self.is_paused = true;
+                }
+                if ui.button("Reprendre").clicked() {
+                    self.player.resume();
+                    self.is_paused = false;
+                }
+                if ui.button("Suivant").clicked() {
+                    if let Some(current) = &self.current {
+                        if let Some(idx) = self.playlist.iter().position(|f| f.path == current.path) {
+                            let next_idx = (idx + 1) % self.playlist.len();
+                            if let Some(next_file) = self.playlist.get(next_idx) {
+                                self.player.play(next_file.path.clone());
+                                self.current = Some(next_file.clone());
+                                self.is_playing = true;
+                                self.is_paused = false;
+                            }
+                        }
+                    }
+                }
+                if ui.button("Stop").clicked() {
+                    self.player.stop();
+                    self.is_playing = false;
+                    self.is_paused = false;
+                    self.current = None;
+                }
+                if ui.button("Mélanger").clicked() {
+                    use rand::seq::SliceRandom;
+                    let mut v = self.playlist.clone();
+                    v.shuffle(&mut rng());
+                    self.playlist = v;
+                }
+            });
+
+            ui.separator();
+            ui.label("Playlist :");
+            egui::ScrollArea::vertical().show(ui, |ui| {
+                for file in &self.playlist {
+                    ui.horizontal(|ui| {
+                        ui.label(
+                            file.path
+                                .file_name()
+                                .map(|n| n.to_string_lossy())
+                                .unwrap_or_default(),
+                        );
+                        if ui.button("Lire").clicked() {
+                            self.player.play(file.path.clone());
+                            self.current = Some(file.clone());
+                            self.is_playing = true;
+                            self.is_paused = false;
+                        }
+                    });
+                }
+            });
+        });
+    }
+}
+
+pub fn main() -> eframe::Result<()> {
+    let options = eframe::NativeOptions::default();
+    eframe::run_native(
+        "Audio Arena",
+        options,
+        Box::new(|_cc| Ok(Box::new(GuiPlayerApp::default()))),
+    )
 }

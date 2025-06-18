@@ -15,7 +15,7 @@ This project relies on the following libraries:
 
 - `walkdir`: For traversing directories and loading audio files.
 - `rodio`: For audio playback.
-- `druid` (or another chosen graphical library): For creating a cross-platform graphical user interface.
+- `egui`: For creating a cross-platform graphical user interface.
 
 ## Installation
 
@@ -45,4 +45,4 @@ Contributions are welcome! Please feel free to submit a pull request or open an 
 
 ## License
 
-This project is licensed under the MIT License. See the LICENSE file for more details.
+This project is licensed under the APACHE 2.0 and MIT licenses. See the LICENSES folder for more details.

@@ -4,8 +4,10 @@ use rand::seq::SliceRandom;
 use rand::{rng};
 
 #[derive(Debug, Clone)]
+#[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
 pub struct AudioFile {
     pub path: PathBuf,
+    pub duration: String, // Format "mm:ss"
 }
 
 pub struct AudioLibrary {
@@ -13,6 +15,11 @@ pub struct AudioLibrary {
 }
 
 impl AudioLibrary {
+    /// Crée une nouvelle bibliothèque audio vide
+    pub fn new() -> Self {
+        Self { files: Vec::new() }
+    }
+
     /// Charge tous les fichiers audio d'un dossier (récursif)
     pub fn load_from_dir(dir: &str) -> Self {
         let files = WalkDir::new(dir)
@@ -23,8 +30,9 @@ impl AudioLibrary {
                 let path = entry.into_path();
                 if let Some(ext) = path.extension().and_then(|e| e.to_str()) {
                     let ext = ext.to_lowercase();
+                    let duration = "00:00".to_string(); // Placeholder for duration
                     if ["mp3", "flac", "wav", "ogg", "m4a"].contains(&ext.as_str()) {
-                        Some(AudioFile { path })
+                        Some(AudioFile { path, duration })
                     } else {
                         None
                     }

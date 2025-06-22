@@ -1,14 +1,10 @@
 use audio_lib::{AudioLibrary, AudioFile};
 use audio_player::AudioPlayer;
-use eframe::{egui, App, Frame};
-use egui::{TextStyle, TextWrapMode};
-use rand::rng;
-use rfd::FileDialog;
-use log::{debug, error, info, trace, warn};
+use eframe::{egui};
+use log::info;
 use env_logger::Env;
 mod playlist_table;
 use playlist_table::{Playlist, Track};
-use std::collections::BTreeMap;
 use egui::FontData;
 use eframe::egui::{FontDefinitions, FontFamily};
 use std::sync::Arc;

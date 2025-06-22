@@ -46,10 +46,10 @@ impl Playlist {
 
     /// Affiche la playlist. Retourne l'index cliqué si une ligne est sélectionnée.
     pub fn show(&self, ui: &mut Ui) -> Option<usize> {
-        let mut clicked_index = Some(0);
+        let clicked_index = Some(0);
         let available_height = ui.available_height();
 
-        let mut table = TableBuilder::new(ui)
+        let table = TableBuilder::new(ui)
             .striped(true)
             .resizable(true)
             .cell_layout(egui::Layout::left_to_right(egui::Align::Center))

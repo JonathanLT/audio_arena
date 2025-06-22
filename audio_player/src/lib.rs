@@ -1,10 +1,10 @@
-use std::{fmt::Debug, path::PathBuf};
+use std::path::PathBuf;
 use std::fs::File;
 use std::io::BufReader;
 use rodio::{Decoder, OutputStream, Sink};
 use std::sync::{mpsc::{self, Sender, Receiver}};
 use std::thread;
-use log::{debug, error, info, trace, warn};
+use log::info;
 
 pub enum PlayerEvent {
     Play(PathBuf),

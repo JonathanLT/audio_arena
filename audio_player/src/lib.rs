@@ -1,9 +1,10 @@
-use std::path::PathBuf;
+use std::{fmt::Debug, path::PathBuf};
 use std::fs::File;
 use std::io::BufReader;
 use rodio::{Decoder, OutputStream, Sink};
 use std::sync::{mpsc::{self, Sender, Receiver}};
 use std::thread;
+use log::{debug, error, info, trace, warn};
 
 pub enum PlayerEvent {
     Play(PathBuf),
@@ -64,6 +65,7 @@ fn player_thread(rx: Receiver<PlayerEvent>) {
             match event {
                 PlayerEvent::Play(path) => {
                     if let Some(s) = &sink { s.stop(); }
+                    info!("Playing audio: {:#?}", path);
                     let s = Sink::try_new(&stream_handle).unwrap();
                     let file = BufReader::new(File::open(path).unwrap());
                     let source = Decoder::new(file).unwrap();

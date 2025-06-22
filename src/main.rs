@@ -8,6 +8,10 @@ use log::{debug, error, info, trace, warn};
 use env_logger::Env;
 mod playlist_table;
 use playlist_table::{Playlist, Track};
+use std::collections::BTreeMap;
+use egui::FontData;
+use eframe::egui::{FontDefinitions, FontFamily};
+use std::sync::Arc;
 
 pub struct GuiPlayerApp {
     library: AudioLibrary,
@@ -21,7 +25,29 @@ pub struct GuiPlayerApp {
     playlist_table: Playlist,
 }
 
+impl GuiPlayerApp {
+    fn setup_fonts(&mut self, ctx: &egui::Context) {
+        let mut fonts = FontDefinitions::default();
+
+        // Ajouter une nouvelle police
+        fonts.font_data.insert(
+            "ma_police".to_string(),
+            Arc::new(FontData::from_static(include_bytes!("../fonts/M_PLUS_Rounded_1c/MPLUSRounded1c-Regular.ttf"))),
+        );
+
+        // Utiliser cette police comme principale pour le texte proportionnel
+        fonts
+            .families
+            .get_mut(&FontFamily::Proportional)
+            .unwrap()
+            .insert(0, "ma_police".to_string());
+
+        ctx.set_fonts(fonts);
+    }
+}
+
 impl Default for GuiPlayerApp {
+    
     fn default() -> Self {
         Self {
             library: AudioLibrary::new(),
@@ -36,6 +62,7 @@ impl Default for GuiPlayerApp {
         }
     }
 }
+
 fn main() -> eframe::Result {
     // Initialize the logger to capture debug messages
     let env = Env::default()
@@ -53,7 +80,11 @@ fn main() -> eframe::Result {
     eframe::run_native(
         "Audio Arena",
         options,
-        Box::new(|_cc| Ok(Box::<GuiPlayerApp>::default())),
+        Box::new(|cc| {
+            let mut app = GuiPlayerApp::default();
+            app.setup_fonts(&cc.egui_ctx); // configuration de la police
+            Ok(Box::new(app))
+        }),
     )
 }
 
@@ -85,6 +116,9 @@ impl eframe::App for GuiPlayerApp {
                         ui.label("Picked folder:");
                         ui.monospace(picked_folder);
                     });
+                }
+                if ui.button("Toggle hide").clicked() {
+                    self.playlist_table.toggle_hidden();
                 }
             });
             ui.separator();
@@ -165,7 +199,6 @@ impl eframe::App for GuiPlayerApp {
                                 duration: file.duration.to_string(),
                             });
                         }
-
                     }
                     if ui.button("Clear Playlist").clicked() {
                         info!("Playlist cleared.");

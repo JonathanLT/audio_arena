@@ -8,3 +8,4 @@ audio_player = { path = "../audio_player" }
 walkdir = "2.4"
 symphonia = { version = "0.5", features = ["all"] }
 rand = "0.9.1"
+mp3-duration = "0.1.10"

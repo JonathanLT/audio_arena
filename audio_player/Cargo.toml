@@ -6,3 +6,4 @@ edition = "2024"
 [dependencies]
 rodio = "0.20.1"
 crossterm = "0.29.0"
+log = "0.4.27"
